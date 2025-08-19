@@ -58,6 +58,8 @@ public class EmployeeService {
         existingEmployee.setDepartment(employeeDTO.getDepartment());
         existingEmployee.setRole(employeeDTO.getRole());
         existingEmployee.setManagerId(employeeDTO.getManagerId());
+        existingEmployee.setJoiningDate(employeeDTO.getJoiningDate());
+        existingEmployee.setAnnualLeaveBalance(employeeDTO.getAnnualLeaveBalance());
         
         Employee updatedEmployee = employeeRepository.save(existingEmployee);
         return convertToDTO(updatedEmployee);
@@ -90,6 +92,8 @@ public class EmployeeService {
         dto.setDepartment(employee.getDepartment());
         dto.setRole(employee.getRole());
         dto.setManagerId(employee.getManagerId());
+        dto.setJoiningDate(employee.getJoiningDate());
+        dto.setAnnualLeaveBalance(employee.getAnnualLeaveBalance());
         
         // Set manager name if available
         if (employee.getManagerId() != null) {
@@ -108,6 +112,8 @@ public class EmployeeService {
         employee.setDepartment(dto.getDepartment());
         employee.setRole(dto.getRole());
         employee.setManagerId(dto.getManagerId());
+        employee.setJoiningDate(dto.getJoiningDate());
+        employee.setAnnualLeaveBalance(dto.getAnnualLeaveBalance());
         return employee;
     }
 }

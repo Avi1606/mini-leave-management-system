@@ -9,6 +9,7 @@ A comprehensive Spring Boot application for managing employee leave requests wit
 - **Manager Authorization**: Only managers can approve/reject requests for their team members
 - **Business Logic**: Prevents overlapping leave requests and validates dates
 - **Working Days Calculation**: Automatically excludes weekends
+- **Leave Balance Tracking**: Annual leave balance stored per employee; applying before joining date is blocked; requests exceeding balance are rejected; balance is deducted on approval
 - **API Documentation**: Swagger/OpenAPI documentation
 - **Database Console**: H2 console for database inspection
 
@@ -97,6 +98,7 @@ src/main/resources/
 | DELETE | `/api/employees/{id}` | Delete employee |
 | GET | `/api/employees/department/{dept}` | Get employees by department |
 | GET | `/api/employees/team/{managerId}` | Get team members |
+| GET | `/api/employees/{id}/leave-balance` | Get annual leave balance for employee |
 
 ### Leave Request Management
 
@@ -145,10 +147,12 @@ The application uses `application.yml` for configuration:
 ## 💡 Business Rules
 
 1. **Date Validation**: Start date cannot be after end date or in the past
-2. **No Overlapping**: Employees cannot have overlapping approved leaves
+2. **No Overlapping**: Employees cannot have overlapping pending/approved leaves
 3. **Manager Authorization**: Only direct managers can approve/reject requests
 4. **Weekend Exclusion**: Working days calculation excludes weekends
 5. **Email Uniqueness**: Employee emails must be unique
+6. **Joining Date Enforcement**: Cannot apply for leave before joining date
+7. **Leave Balance Enforcement**: Annual leave requests cannot exceed available balance; balance deducted on approval
 
 ## 🧪 Testing
 
@@ -163,7 +167,7 @@ The application uses `application.yml` for configuration:
 ```bash
 curl -X POST http://localhost:8080/api/employees \
   -H "Content-Type: application/json" \
-  -d '{"name":"Jane Doe","email":"jane.doe@company.com","department":"IT","role":"Developer","managerId":1}'
+  -d '{"name":"Jane Doe","email":"jane.doe@company.com","department":"IT","role":"Developer","managerId":1,"joiningDate":"2025-01-01","annualLeaveBalance":12}'
 ```
 
 **Submit a leave request:**
@@ -178,6 +182,11 @@ curl -X POST http://localhost:8080/api/leave-requests \
 curl -X PUT http://localhost:8080/api/leave-requests/1/approve \
   -H "Content-Type: application/json" \
   -d '{"managerId":1,"comments":"Approved for summer vacation"}'
+```
+
+**Check leave balance:**
+```bash
+curl -X GET http://localhost:8080/api/employees/2/leave-balance
 ```
 
 ## 🐛 Error Handling

@@ -2,6 +2,7 @@ package com.avi.leavemgmt.controller;
 
 import com.avi.leavemgmt.dto.EmployeeDTO;
 import com.avi.leavemgmt.service.EmployeeService;
+import com.avi.leavemgmt.repository.EmployeeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,10 +23,12 @@ import java.util.Optional;
 public class EmployeeController {
     
     private final EmployeeService employeeService;
+    private final EmployeeRepository employeeRepository;
     
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(EmployeeService employeeService, EmployeeRepository employeeRepository) {
         this.employeeService = employeeService;
+        this.employeeRepository = employeeRepository;
     }
     
     @GetMapping
@@ -120,5 +123,21 @@ public class EmployeeController {
             @Parameter(description = "Manager ID", required = true) @PathVariable Long managerId) {
         List<EmployeeDTO> teamMembers = employeeService.getTeamMembers(managerId);
         return ResponseEntity.ok(teamMembers);
+    }
+
+    @GetMapping("/{id}/leave-balance")
+    @Operation(summary = "Get leave balance", description = "Retrieve annual leave balance for an employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Balance retrieved"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    public ResponseEntity<?> getLeaveBalance(
+            @Parameter(description = "Employee ID", required = true) @PathVariable Long id) {
+        return employeeRepository.findById(id)
+                .map(emp -> ResponseEntity.ok().body(java.util.Map.of(
+                        "employeeId", emp.getId(),
+                        "annualLeaveBalance", emp.getAnnualLeaveBalance()
+                )))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

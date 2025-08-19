@@ -22,7 +22,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<LeaveRequest> findByEmployeeIdAndStatus(Long employeeId, LeaveRequest.LeaveStatus status);
     
     @Query("SELECT lr FROM LeaveRequest lr WHERE lr.employeeId = :employeeId " +
-           "AND lr.status = 'APPROVED' " +
+           "AND lr.status IN ('PENDING','APPROVED') " +
            "AND ((lr.startDate <= :endDate AND lr.endDate >= :startDate))")
     List<LeaveRequest> findOverlappingApprovedLeaves(@Param("employeeId") Long employeeId,
                                                     @Param("startDate") LocalDate startDate,

@@ -59,6 +59,11 @@ public class LeaveRequestService {
         if (leaveRequestDTO.getStartDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("Cannot apply for leave in the past");
         }
+
+        // Validate start date must not be before joining date
+        if (leaveRequestDTO.getStartDate().isBefore(employee.getJoiningDate())) {
+            throw new RuntimeException("Cannot apply for leave before joining date");
+        }
         
         // Check for overlapping approved leaves
         List<LeaveRequest> overlappingLeaves = leaveRequestRepository.findOverlappingApprovedLeaves(
@@ -69,6 +74,14 @@ public class LeaveRequestService {
         
         if (!overlappingLeaves.isEmpty()) {
             throw new RuntimeException("Leave request overlaps with existing approved leave");
+        }
+
+        // Check available balance for ANNUAL leaves
+        long workingDays = calculateWorkingDays(leaveRequestDTO.getStartDate(), leaveRequestDTO.getEndDate());
+        if (leaveRequestDTO.getLeaveType() == com.avi.leavemgmt.model.LeaveType.ANNUAL) {
+            if (employee.getAnnualLeaveBalance() == null || employee.getAnnualLeaveBalance() < workingDays) {
+                throw new RuntimeException("Requested leave days exceed available annual leave balance");
+            }
         }
         
         LeaveRequest leaveRequest = convertToEntity(leaveRequestDTO);
@@ -99,6 +112,16 @@ public class LeaveRequestService {
         leaveRequest.setApprovedBy(managerId);
         leaveRequest.setApprovedDate(LocalDate.now());
         leaveRequest.setComments(comments);
+
+        // Deduct balance for ANNUAL leave upon approval
+        if (leaveRequest.getLeaveType() == com.avi.leavemgmt.model.LeaveType.ANNUAL) {
+            long workingDays = calculateWorkingDays(leaveRequest.getStartDate(), leaveRequest.getEndDate());
+            Employee emp = employeeRepository.findById(leaveRequest.getEmployeeId())
+                    .orElseThrow(() -> new RuntimeException("Employee not found"));
+            int remaining = Math.max(0, emp.getAnnualLeaveBalance() - (int) workingDays);
+            emp.setAnnualLeaveBalance(remaining);
+            employeeRepository.save(emp);
+        }
         
         LeaveRequest updatedRequest = leaveRequestRepository.save(leaveRequest);
         return convertToDTO(updatedRequest);

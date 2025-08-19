@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: mini-leave-management-system
+    env: java
+    plan: free
+    autoDeploy: true
+    buildCommand: mvn -DskipTests package
+    startCommand: java -Dserver.port=$PORT -jar target/mini-leave-management-system-1.0.0.jar
+    healthCheckPath: /api/employees

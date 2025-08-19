@@ -1,17 +1,17 @@
 -- Sample data for Mini Leave Management System
 
--- Insert employees
-INSERT INTO employees (name, email, department, role, manager_id) VALUES
-('John Smith', 'john.smith@company.com', 'Engineering', 'Engineering Manager', NULL),
-('Alice Johnson', 'alice.johnson@company.com', 'Engineering', 'Senior Developer', 1),
-('Bob Wilson', 'bob.wilson@company.com', 'Engineering', 'Developer', 1),
-('Carol Brown', 'carol.brown@company.com', 'Engineering', 'QA Engineer', 1),
-('David Miller', 'david.miller@company.com', 'HR', 'HR Manager', NULL),
-('Emma Davis', 'emma.davis@company.com', 'HR', 'HR Specialist', 5),
-('Frank Garcia', 'frank.garcia@company.com', 'Marketing', 'Marketing Manager', NULL),
-('Grace Lee', 'grace.lee@company.com', 'Marketing', 'Marketing Specialist', 7),
-('Henry Clark', 'henry.clark@company.com', 'Finance', 'Finance Manager', NULL),
-('Ivy Rodriguez', 'ivy.rodriguez@company.com', 'Finance', 'Accountant', 9);
+-- Insert employees (with joining_date and annual_leave_balance)
+INSERT INTO employees (name, email, department, role, manager_id, joining_date, annual_leave_balance) VALUES
+('John Smith', 'john.smith@company.com', 'Engineering', 'Engineering Manager', NULL, '2023-01-01', 25),
+('Alice Johnson', 'alice.johnson@company.com', 'Engineering', 'Senior Developer', 1, '2023-03-15', 20),
+('Bob Wilson', 'bob.wilson@company.com', 'Engineering', 'Developer', 1, '2023-05-10', 18),
+('Carol Brown', 'carol.brown@company.com', 'Engineering', 'QA Engineer', 1, '2023-06-01', 18),
+('David Miller', 'david.miller@company.com', 'HR', 'HR Manager', NULL, '2022-11-20', 25),
+('Emma Davis', 'emma.davis@company.com', 'HR', 'HR Specialist', 5, '2023-02-01', 20),
+('Frank Garcia', 'frank.garcia@company.com', 'Marketing', 'Marketing Manager', NULL, '2022-10-10', 25),
+('Grace Lee', 'grace.lee@company.com', 'Marketing', 'Marketing Specialist', 7, '2023-01-20', 20),
+('Henry Clark', 'henry.clark@company.com', 'Finance', 'Finance Manager', NULL, '2022-12-15', 25),
+('Ivy Rodriguez', 'ivy.rodriguez@company.com', 'Finance', 'Accountant', 9, '2023-04-05', 20);
 
 -- Insert sample leave requests
 INSERT INTO leave_requests (employee_id, leave_type, start_date, end_date, reason, status, applied_date, approved_by, approved_date, comments) VALUES

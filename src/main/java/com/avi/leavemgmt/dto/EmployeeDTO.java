@@ -2,7 +2,11 @@ package com.avi.leavemgmt.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 
 public class EmployeeDTO {
     
@@ -26,6 +30,13 @@ public class EmployeeDTO {
     
     private Long managerId;
     private String managerName;
+
+    @NotNull(message = "Joining date is required")
+    private LocalDate joiningDate;
+
+    @NotNull(message = "Annual leave balance is required")
+    @Min(value = 0, message = "Annual leave balance cannot be negative")
+    private Integer annualLeaveBalance;
     
     // Constructors
     public EmployeeDTO() {
@@ -95,5 +106,21 @@ public class EmployeeDTO {
     
     public void setManagerName(String managerName) {
         this.managerName = managerName;
+    }
+
+    public LocalDate getJoiningDate() {
+        return joiningDate;
+    }
+
+    public void setJoiningDate(LocalDate joiningDate) {
+        this.joiningDate = joiningDate;
+    }
+
+    public Integer getAnnualLeaveBalance() {
+        return annualLeaveBalance;
+    }
+
+    public void setAnnualLeaveBalance(Integer annualLeaveBalance) {
+        this.annualLeaveBalance = annualLeaveBalance;
     }
 }

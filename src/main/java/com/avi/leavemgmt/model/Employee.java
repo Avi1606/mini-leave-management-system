@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "employees")
@@ -35,6 +36,12 @@ public class Employee {
     
     @Column(name = "manager_id")
     private Long managerId;
+    
+    @Column(name = "joining_date", nullable = false)
+    private LocalDate joiningDate;
+    
+    @Column(name = "annual_leave_balance", nullable = false)
+    private Integer annualLeaveBalance = 20;
     
     // Constructors
     public Employee() {
@@ -97,6 +104,22 @@ public class Employee {
         this.managerId = managerId;
     }
     
+    public LocalDate getJoiningDate() {
+        return joiningDate;
+    }
+    
+    public void setJoiningDate(LocalDate joiningDate) {
+        this.joiningDate = joiningDate;
+    }
+    
+    public Integer getAnnualLeaveBalance() {
+        return annualLeaveBalance;
+    }
+    
+    public void setAnnualLeaveBalance(Integer annualLeaveBalance) {
+        this.annualLeaveBalance = annualLeaveBalance;
+    }
+    
     @Override
     public String toString() {
         return "Employee{" +
@@ -106,6 +129,8 @@ public class Employee {
                 ", department='" + department + '\'' +
                 ", role='" + role + '\'' +
                 ", managerId=" + managerId +
+                ", joiningDate=" + joiningDate +
+                ", annualLeaveBalance=" + annualLeaveBalance +
                 '}';
     }
 }
