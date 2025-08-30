@@ -1,6 +1,7 @@
 package com.avi.leavemgmt.service;
 
 import com.avi.leavemgmt.dto.EmployeeDTO;
+import com.avi.leavemgmt.exception.EmployeeNotFoundException;
 import com.avi.leavemgmt.model.Employee;
 import com.avi.leavemgmt.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ import java.util.stream.Collectors;
 public class EmployeeService {
     
     private final EmployeeRepository employeeRepository;
+    private final LeaveCalculationService leaveCalculationService;
     
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, LeaveCalculationService leaveCalculationService) {
         this.employeeRepository = employeeRepository;
+        this.leaveCalculationService = leaveCalculationService;
     }
     
     public List<EmployeeDTO> getAllEmployees() {
@@ -39,13 +42,20 @@ public class EmployeeService {
         }
         
         Employee employee = convertToEntity(employeeDTO);
+        
+        // Calculate pro-rated leave balance based on joining date
+        if (employee.getJoiningDate() != null) {
+            int proRatedLeave = leaveCalculationService.calculateProRatedLeaveForEmployee(employee.getJoiningDate());
+            employee.setAnnualLeaveBalance(proRatedLeave);
+        }
+        
         Employee savedEmployee = employeeRepository.save(employee);
         return convertToDTO(savedEmployee);
     }
     
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
         Employee existingEmployee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
         
         // Check if email is being changed and if new email already exists
         if (!existingEmployee.getEmail().equals(employeeDTO.getEmail()) &&

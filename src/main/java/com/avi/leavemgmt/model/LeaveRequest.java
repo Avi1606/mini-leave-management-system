@@ -57,7 +57,7 @@ public class LeaveRequest {
     
     // Nested enum for status
     public enum LeaveStatus {
-        PENDING, APPROVED, REJECTED
+        PENDING, APPROVED, REJECTED, CANCELLED
     }
     
     // Constructors

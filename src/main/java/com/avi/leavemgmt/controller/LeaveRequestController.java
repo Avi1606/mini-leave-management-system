@@ -136,4 +136,31 @@ public class LeaveRequestController {
         List<LeaveRequestDTO> leaveRequests = leaveRequestService.getLeaveRequestsForManager(managerId);
         return ResponseEntity.ok(leaveRequests);
     }
+    
+    @PutMapping("/{id}/cancel")
+    @Operation(summary = "Cancel leave request", description = "Cancel a pending leave request (only by the employee who submitted it)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Leave request cancelled successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or business rule violation"),
+            @ApiResponse(responseCode = "404", description = "Leave request not found"),
+            @ApiResponse(responseCode = "403", description = "Employee does not have authority to cancel")
+    })
+    public ResponseEntity<?> cancelLeaveRequest(
+            @Parameter(description = "Leave request ID", required = true) @PathVariable Long id,
+            @Parameter(description = "Cancellation data", required = true) @RequestBody Map<String, Object> cancellationData) {
+        try {
+            Long employeeId = Long.valueOf(cancellationData.get("employeeId").toString());
+            String reason = (String) cancellationData.getOrDefault("reason", "Cancelled by employee");
+            
+            LeaveRequestDTO cancelledRequest = leaveRequestService.cancelLeaveRequest(id, employeeId, reason);
+            return ResponseEntity.ok(cancelledRequest);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            } else if (e.getMessage().contains("authority") || e.getMessage().contains("authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
